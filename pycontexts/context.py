@@ -1,25 +1,9 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Callable
 
 
 class Context:
     def __init__(self, **kwargs: Any) -> None:
         self.inner = {k: [v] for k, v in kwargs.items()}
-
-    def __delattr__(self, name):
-        del self.inner[name]
-
-    def __getattribute__(self, name: str) -> Any:
-        if key in self.inner:
-            return self.inner[key][-1]
-        else:
-            raise AttributeError(f"Key {key} not in context")
-
-    def __setattr__(self, name, value):
-        if name not in _context_dict:
-            self.inner[name] = [value]
-        else:
-            self.inner[name][-1] = value
-
 
 default_ctx = Context()
 
@@ -42,7 +26,7 @@ def get_dict(
 ) -> Dict[str, Any]:
     results = {}
     for key in keys:
-        if key in smeelf.context:
+        if key in __ctx.inner:
             results[key] = __ctx.inner[key][-1]
         elif default_fn:
             results[key] = default_fn(key)

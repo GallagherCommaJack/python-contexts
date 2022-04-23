@@ -2,3 +2,5 @@ __pycache__
 dist
 .vscode
 .pytest_cache
+*.ipynb
+.python-version
