@@ -5,6 +5,7 @@ class Context:
     def __init__(self, **kwargs: Any) -> None:
         self.inner = {k: [v] for k, v in kwargs.items()}
 
+
 default_ctx = Context()
 
 
@@ -46,10 +47,9 @@ def pop_many(
     results = {}
     for key in keys:
         if key in __ctx.inner:
-            __ctx.inner[key].pop()
+            results[key] = __ctx.inner[key].pop()
             if __ctx.inner[key] == []:
                 del __ctx.inner[key]
-            results[key] = v
         elif default_fn:
             results[key] = default_fn(key)
     return results
