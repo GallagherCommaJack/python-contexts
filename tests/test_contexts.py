@@ -1,4 +1,4 @@
-from contexts import __version__, push, pop, get, get_dict
+from pycontexts import __version__, push, pop, get, get_dict
 
 def test_version():
     assert __version__ == '0.1.0'
