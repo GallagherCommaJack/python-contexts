@@ -5,12 +5,30 @@ class Context:
     def __init__(self, **kwargs: Any) -> None:
         self.inner = {k: [v] for k, v in kwargs.items()}
 
+    def __getitem__(self, key: str) -> Any:
+        return self.inner[key][-1]
 
-default_ctx = Context()
+    def __setitem__(self, key: str, value: Any) -> None:
+        if key not in self.inner:
+            self.inner[key] = [value]
+        else:
+            self.inner[key][-1] = value
+
+    def keys(self) -> List[str]:
+        return list(self.inner.keys())
+
+    def vals(self) -> List[Any]:
+        return [self[k] for k in self.keys()]
+
+    def items(self) -> List[Tuple[str, Any]]:
+        return [(k, self[k]) for k in self.keys()]
+
+
+default = Context()
 
 
 def push(
-    __ctx=default_ctx,
+    __ctx=default,
     **kwargs,
 ):
     for k, v in kwargs.items():
@@ -22,7 +40,7 @@ def push(
 
 def get_dict(
     *keys: str,
-    __ctx=default_ctx,
+    __ctx=default,
     default_fn: Optional[Callable[[str], Any]] = None,
 ) -> Dict[str, Any]:
     results = {}
@@ -36,7 +54,7 @@ def get_dict(
 
 def pop_many(
     *keys: str,
-    __ctx=default_ctx,
+    __ctx=default,
     strict: bool = False,
     default_fn: Optional[Callable[[str], Any]] = None,
 ) -> Dict[str, Any]:
@@ -60,7 +78,7 @@ class Override:
     helper object for pushing and popping context in a scope
     """
 
-    def __init__(self, __ctx=default_ctx, **kwargs):
+    def __init__(self, __ctx=default, **kwargs):
         self.inner = __ctx
         self.overrides = kwargs
 
@@ -71,25 +89,5 @@ class Override:
         pop_many(self.inner, *self.overrides.keys())
 
 
-def override(__ctx=default_ctx, **kwargs):
+def override(__ctx=default, **kwargs):
     return Override(__ctx, **kwargs)
-
-
-class EnterContext:
-    def __init__(self, __ctx=default_ctx, **kwargs):
-        self.ctx = ctx
-        self.overrides = kwargs
-
-    def __enter__(self):
-        push(self.ctx, **self.overrides)
-        for k, v in self.ctx.inner.items():
-            globals()[k] = v[-1]
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        for k in self.ctx.inner.keys():
-            del globals()[k]
-        pop_many(self.ctx, *self.overrides.keys())
-
-
-def enter(__ctx=default_ctx, **kwargs):
-    return EnterContext(__ctx, **kwargs)
