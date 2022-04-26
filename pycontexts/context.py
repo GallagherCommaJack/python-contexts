@@ -52,6 +52,17 @@ def get_dict(
     return results
 
 
+def get(
+    key: str,
+    __ctx=default,
+    default_val: Optional[Any] = None,
+):
+    if key in __ctx.inner:
+        return __ctx.inner[key][-1]
+    else:
+        return default_val
+
+
 def pop_many(
     *keys: str,
     __ctx=default,
