@@ -1,8 +1,5 @@
 from pycontexts import __version__, push, pop_many, get_dict
 
-def test_version():
-    assert __version__ == '0.1.0'
-
 def test_push_pop():
     push(a=1, b=2)
     assert get_dict('a', 'b') == dict(a=1, b=2)
